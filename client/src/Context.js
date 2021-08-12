@@ -92,9 +92,9 @@ export class Provider extends Component{
         e.preventDefault();
         const newUser = await this.data.api('/users', 'POST', this.state.formData, false, null);
         if(newUser.status === 201){
-            return newUser.json().then(user => user)
+            appHistory.push('/');
         } else {
-            return null;
+            return newUser.json().then(data => {throw new Error(data)})
         }
         
     }
@@ -106,12 +106,13 @@ export class Provider extends Component{
             password: this.state.authenticatedUser.password
         }
         
-        await this.data.api('/courses', 'POST', this.state.formData, true, credentials)
-            .then(response => console.log(response.json()))
-        
-
-        appHistory.push('/');
-       
+        const newCourse = await this.data.api('/courses', 'POST', {...this.state.formData, userId: this.state.authenticatedUser.id}, true, credentials);
+        if(newCourse.status === 201){
+            appHistory.push('/');
+        } else {
+            newCourse.json().then(data => {throw new Error(data)})
+        }
+       this.resetFormState();
         
     }
 
@@ -124,11 +125,10 @@ export class Provider extends Component{
         const updatedCourse = await this.data.api(`/courses/${id}`, 'PUT', this.formData, true, credentials);
         if(updatedCourse.status === 201){
             appHistory.push('/');
-            this.resetFormState();
         } else {
-            console.log(updatedCourse);
+            updatedCourse.json().then(data => {throw new Error(data)})
         }
-        
+        this.resetFormState();
     }
 
     handleInput = (e) => {
@@ -140,7 +140,7 @@ export class Provider extends Component{
         });
     }
 
-    resetFormState = async() => {
+    resetFormState = () => {
         this.setState({
             formData: {}
         });
