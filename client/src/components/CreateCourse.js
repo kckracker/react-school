@@ -1,5 +1,7 @@
-import {Link} from 'react-router-dom';
+import {Buttons} from './Buttons';
+import withContext from '../Context';
 
+const ButtonsWithContext = withContext(Buttons);
 // Renders form to add new course to a user's list - POST request api/courses - along with Cancel button for return to Course List view
 export function CreateCourse(props){
 
@@ -34,7 +36,7 @@ export function CreateCourse(props){
                             <textarea id="materialsNeeded" name="materialsNeeded" onChange={context.actions.handleInput} ></textarea>
                         </div>
                     </div>
-                    <button className="button" type="submit">Create Course</button><Link className="button button-secondary" to="/">Cancel</Link> 
+                    <ButtonsWithContext buttonName="Create Course" />
                 </form>
             </div>
         </main>

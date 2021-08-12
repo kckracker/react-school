@@ -105,13 +105,13 @@ export class Provider extends Component{
             username: this.state.authenticatedUser.emailAddress,
             password: this.state.authenticatedUser.password
         }
-        const newCourse = await this.data.api('/courses', 'POST', this.state.formData, true, credentials);
-        if(newCourse.status === 201){
-            appHistory.push('/');
-        } else {
-            console.log(newCourse.error);
-        }
-        this.resetFormState();
+        
+        await this.data.api('/courses', 'POST', this.state.formData, true, credentials)
+            .then(response => console.log(response.json()))
+        
+
+        appHistory.push('/');
+       
         
     }
 
@@ -140,7 +140,7 @@ export class Provider extends Component{
         });
     }
 
-    resetFormState = () => {
+    resetFormState = async() => {
         this.setState({
             formData: {}
         });

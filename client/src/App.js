@@ -1,6 +1,5 @@
 import { BrowserRouter as Router} from 'react-router-dom';
 import { Route, Switch } from 'react-router-dom';
-import { appHistory } from './Context';
 
 import { Header } from './components/Header';
 import {UserSignUp } from './components/UserSignUp';
@@ -23,10 +22,11 @@ const UserSignOutwithContext = withContext(UserSignOut);
 const HeaderWithContext = withContext(Header);
 
 
+
 function App() {
 
   return (
-    <Router history={appHistory}>
+    <Router>
       <div>
           <HeaderWithContext />
           <Switch>
