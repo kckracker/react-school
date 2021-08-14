@@ -38,11 +38,19 @@ export function CourseDetail(props){
         <main>
             <div className="actions--bar">
                 <div className="wrap">
+                { context.credentials ?
+                    <>
                     <Link className="button" to={{
                         pathname: `/courses/${id}/update`
                     }}>Update Course</Link>
                     <button type="button" className="button" onClick={deleteCourse}>Delete Course</button>
                     <Link className="button button-secondary" to="/">Return to List</Link>
+                    </>
+                    :
+                    <> 
+                    <Link className="button button-secondary" to="/">Return to List</Link>
+                    </>
+                    }
                 </div>
             </div>
             

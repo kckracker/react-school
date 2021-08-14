@@ -9,7 +9,7 @@ export function PrivateRoute(props, {component, path}){
             path={path}
             render={({location}) =>
                 authUser ?
-                    component
+                    (component)
                 :   (<Redirect to={{
                     pathname: '/signin',
                     state: { from: location }
