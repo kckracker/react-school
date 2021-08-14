@@ -34,9 +34,13 @@ function App() {
               <Route path="/signup" component={UserSignUpwithContext} />             
               <Route path="/signin" component={UserSignInwithContext} />
               <Route path="/signout" component={UserSignOutwithContext} />
-              <PrivateRouteWithContext path="/courses/:id/update" component={UpdateCoursewithContext} />
+              <PrivateRouteWithContext path="/courses/:id/update">
+                <UpdateCoursewithContext />
+              </PrivateRouteWithContext>
               <Route path="/courses/:id" component={CourseDetailwithContext} />
-              <PrivateRouteWithContext path="/createcourse" component={CreateCoursewithContext} />
+              <PrivateRouteWithContext path="/createcourse">
+                <CreateCoursewithContext />
+              </PrivateRouteWithContext>
               <Route path="/" component={CourseswithContext} />                
           </Switch>
       </div>

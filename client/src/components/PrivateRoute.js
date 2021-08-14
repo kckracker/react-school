@@ -2,14 +2,15 @@ import {Route, Redirect} from 'react-router-dom';
 
 
 // Use a stateless component to wrap an instance of the Router component and redirects to SignIn if no authenticated user 
-export function PrivateRoute(props, {component, path}){
-    const authUser = props.context.credentials;
+export function PrivateRoute(props, {children, ...rest }){
+    let authUser = props.context.authenticatedUser;
     return(
         <Route
-            path={path}
+            {...rest}
             render={({location}) =>
-                authUser ?
-                    (component)
+                authUser
+                ?    ( children )
+
                 :   (<Redirect to={{
                     pathname: '/signin',
                     state: { from: location }
