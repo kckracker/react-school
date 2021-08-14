@@ -16,6 +16,10 @@ export class Provider extends Component{
     state = {
         authenticatedUser: Cookies.get('authenticatedUser') || null,
         formData: {},
+        credentials: {
+            username: null,
+            password: null
+        } ,
         errors: []
     }
 
@@ -24,10 +28,13 @@ export class Provider extends Component{
     render(){
         
         const { authenticatedUser } = this.state;
-        const {formData} = this.state;
+        const { credentials } = this.state;
+        const { errors } = this.state;
 
         const value = {
             authenticatedUser,
+            credentials,
+            errors,
             data: this.data,
             actions: {
                 signIn: this.signIn,
@@ -37,9 +44,10 @@ export class Provider extends Component{
                 createCourse: this.createCourse,
                 createUser: this.createUser,
                 updateCourse: this.updateCourse, 
-                resetForm: this.resetFormState
+                resetForm: this.resetFormState,
+                deleteCourse: this.deleteCourse
             },
-            formData
+            
         };
 
         return(
@@ -59,58 +67,51 @@ export class Provider extends Component{
                     authenticatedUser: {
                         ...user,
                         password: password
+                    },
+                    credentials: {
+                        username: emailAddress,
+                        password: password
                     }
             });
             Cookies.set('authenticatedUser', user, {expires: 1});
             appHistory.goBack();
             
-        } else if(user === null){
-            appHistory.push('/unauthorized');
         } else {
-            appHistory.push('/error');
+            this.handleError(user);
         }
         this.resetFormState();
     }
 
-    signUp = async(e) => {
+    signUp = async (e) => {
         e.preventDefault();
         let input = this.state.formData;
-        const user =  await this.createUser(input)
-        if(user){
+        const newUser = await this.data.api('/users', 'POST', input, false, null);
+        if(newUser){
             await this.signIn(e);
+        } else {
+            this.handleError(newUser);
         }
     }
 
     signOut = async() => {
         this.setState({
-            authenticatedUser: null
+            authenticatedUser: null,
+            credentials: {
+                username: null,
+                password: null
+            }
         });
         Cookies.remove('authenticatedUser');
     }
 
-    createUser = async(e) => {
-        e.preventDefault();
-        const newUser = await this.data.api('/users', 'POST', this.state.formData, false, null);
-        if(newUser.status === 201){
-            appHistory.push('/');
-        } else {
-            return newUser.json().then(data => {throw new Error(data)})
-        }
-        
-    }
-
     createCourse = async (e) => {
         e.preventDefault();
-        let credentials = {
-            username: this.state.authenticatedUser.emailAddress,
-            password: this.state.authenticatedUser.password
-        }
-        
-        const newCourse = await this.data.api('/courses', 'POST', {...this.state.formData, userId: this.state.authenticatedUser.id}, true, credentials);
+                
+        const newCourse = await this.data.api('/courses', 'POST', {...this.state.formData, userId: this.state.authenticatedUser.id}, true, this.state.credentials);
         if(newCourse.status === 201){
             appHistory.push('/');
         } else {
-            newCourse.json().then(data => {throw new Error(data)})
+            this.handleError(newCourse);
         }
        this.resetFormState();
         
@@ -126,7 +127,7 @@ export class Provider extends Component{
         if(updatedCourse.status === 201){
             appHistory.push('/');
         } else {
-            updatedCourse.json().then(data => {throw new Error(data)})
+            this.handleError(updatedCourse)
         }
         this.resetFormState();
     }
@@ -138,6 +139,10 @@ export class Provider extends Component{
             formData: {...this.state.formData,
             [name]: value}
         });
+    }
+
+    handleError = async (response) => {
+        response.json().then(data => console.log(data))
     }
 
     resetFormState = () => {

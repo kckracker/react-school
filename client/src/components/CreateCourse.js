@@ -11,6 +11,15 @@ export function CreateCourse(props){
         <main>
             <div className="wrap">
                 <h2>Create Course</h2>
+                { context.errors &&
+                    <div className="validation--errors">
+                        <h3>Validation Errors</h3>
+                        <ul>
+                            {context.errors}
+                        </ul>
+                    </div> 
+                }
+
                 <form onSubmit={context.actions.createCourse}>
                     <div className="main--flex">
                         <div>
@@ -43,11 +52,5 @@ export function CreateCourse(props){
     );
 }
 
-/* <div class="validation--errors">
-    <h3>Validation Errors</h3>
-    <ul>
-        <li>Please provide a value for "Title"</li>
-        <li>Please provide a value for "Description"</li>
-    </ul>
-</div> */
+
 

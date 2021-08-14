@@ -1,15 +1,18 @@
 import {useState} from 'react';
-import {Link, useParams} from 'react-router-dom';
+import {Link, useParams, useHistory} from 'react-router-dom';
 
 
 // Retrieves a user's course details - GET request for api/courses/:id - also a Delete button to send DELETE request for api/courses/:id and Update button to direct to the UpdateCourse component
 
 export function CourseDetail(props){
     const context = props.context;
+
+    const history = useHistory();
     const [course, setCourse] = useState([]);
     const [user, setUser] = useState("");
     const [didLoad, setDidLoad] = useState(false);
     const {id} = useParams();
+
 
     const loadCourse = async () => {
         await context.data.fetchCourse(id)
@@ -24,6 +27,13 @@ export function CourseDetail(props){
         loadCourse();
     }
 
+    const deleteCourse = async (e) => {
+        e.preventDefault();
+        await context.data.api(`/courses/${id}`,"DELETE", null, true, context.credentials);
+        history.push('/');
+    }
+    
+
     return(
         <main>
             <div className="actions--bar">
@@ -31,7 +41,7 @@ export function CourseDetail(props){
                     <Link className="button" to={{
                         pathname: `/courses/${id}/update`
                     }}>Update Course</Link>
-                    <Link className="button" to="/">Delete Course</Link>
+                    <button type="button" className="button" onClick={deleteCourse}>Delete Course</button>
                     <Link className="button button-secondary" to="/">Return to List</Link>
                 </div>
             </div>
