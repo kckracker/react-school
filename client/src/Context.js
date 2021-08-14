@@ -16,10 +16,7 @@ export class Provider extends Component{
     state = {
         authenticatedUser: Cookies.get('authenticatedUser') || null,
         formData: {},
-        credentials: {
-            username: null,
-            password: null
-        } ,
+        credentials: null ,
         errors: []
     }
 
@@ -96,10 +93,7 @@ export class Provider extends Component{
     signOut = async() => {
         this.setState({
             authenticatedUser: null,
-            credentials: {
-                username: null,
-                password: null
-            }
+            credentials: null
         });
         Cookies.remove('authenticatedUser');
     }
