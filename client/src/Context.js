@@ -54,8 +54,7 @@ export class Provider extends Component{
         )
     }
 
-    signIn = async (e) => { 
-        e.preventDefault();
+    signIn = async () => { 
         let emailAddress = this.state.formData.emailAddress;
         let password = this.state.formData.password;
         const user = await this.data.fetchUser(emailAddress, password);
@@ -71,7 +70,6 @@ export class Provider extends Component{
                     }
             });
             Cookies.set('authenticatedUser', user, {expires: 1});
-            appHistory.goBack();
             
         } else {
             this.handleError(user);
@@ -136,7 +134,7 @@ export class Provider extends Component{
     }
 
     handleError = async (response) => {
-        response.json().then(data => console.log(data))
+        response.json().then(data => this.errors.push(data)).then(console.log(this.errors));
     }
 
     resetFormState = () => {

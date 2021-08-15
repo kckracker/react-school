@@ -38,9 +38,7 @@ function App() {
                 <UpdateCoursewithContext />
               </PrivateRouteWithContext>
               <Route path="/courses/:id" component={CourseDetailwithContext} />
-              <PrivateRouteWithContext path="/createcourse">
-                <CreateCoursewithContext />
-              </PrivateRouteWithContext>
+              <PrivateRouteWithContext path="/createcourse" component={CreateCoursewithContext} />
               <Route path="/" component={CourseswithContext} />                
           </Switch>
       </div>

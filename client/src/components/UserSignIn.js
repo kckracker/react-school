@@ -1,20 +1,36 @@
 import { Link } from 'react-router-dom';
-import withContext from '../Context';
+import withContext, { appHistory } from '../Context';
 import { Buttons } from './Buttons';
 
+
 const ButtonsWithContext = withContext(Buttons);
+
 // Allows user to sign in with existing credentials and a Cancel button which directs to the Course list
+
+
 
 export function UserSignIn(props){
 
-    const context = props.context; 
+    const context = props.context;
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        await context.actions.signIn()
+            .then(appHistory.goBack())
+            .catch(error => {
+                if(error.status === 404){
+                    appHistory.push('/notfound', context.errors)
+                } else {
+                    appHistory.push('/error', context.errors)
+                }
+            });
+    }
 
     return(
         <main>
             <div className="form--centered">
                 <h2>Sign In</h2>
                 
-                <form onSubmit={context.actions.signIn}>
+                <form onSubmit={handleSubmit}>
                     <label htmlFor="emailAddress">Email Address</label>
                     <input id="emailAddress" name="emailAddress" type="email" placeholder="email address" onChange={context.actions.handleInput} />
                     <label htmlFor="password">Password</label>
