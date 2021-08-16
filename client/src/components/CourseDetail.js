@@ -38,7 +38,7 @@ export function CourseDetail(props){
         <main>
             <div className="actions--bar">
                 <div className="wrap">
-                { context.authenticatedUser.id === user.id ?
+                { context.authenticatedUser && context.authenticatedUser.id === course.userId ?
                     <>
                     <Link className="button" to={{
                         pathname: `/courses/${id}/update`

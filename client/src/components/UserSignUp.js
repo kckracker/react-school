@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Buttons } from "./Buttons";
 import { Link} from "react-router-dom";
 import withContext from "../Context";
@@ -8,12 +9,26 @@ const ButtonsWithContext = withContext(Buttons);
 export function UserSignUp(props){
 
     const context = props.context;
+    const [didLoad, setDidLoad] = useState(false);
+
+    if(didLoad === false){
+        context.actions.resetForm();
+        setDidLoad(true);
+    }
+
 
     return(
         <main>
             <div className="form--centered">
                 <h2>Sign Up</h2>
-                
+                { context.errors &&
+                    <div className="validation--errors">
+                        <h3>Validation Errors</h3>
+                        <ul>
+                            {context.errors}
+                        </ul>
+                    </div> 
+                }
                 <form onSubmit={context.actions.signUp}>
                     <label htmlFor="firstName">First Name</label>
                     <input id="firstName" name="firstName" type="text" defaultValue="" onChange={context.actions.handleInput} />

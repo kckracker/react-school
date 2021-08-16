@@ -7,6 +7,12 @@ const AppContext = React.createContext();
 
 export const appHistory = createBrowserHistory();
 
+const cookies = Cookies.withConverter({
+    read: function(string){
+        return JSON.parse(string)
+    }
+})
+
 export class Provider extends Component{
     constructor(){
         super();
@@ -14,10 +20,10 @@ export class Provider extends Component{
     }
 
     state = {
-        authenticatedUser: Cookies.get('authenticatedUser') || null,
+        authenticatedUser: cookies.get('authenticatedUser', {expires: 1}) || null,
         formData: {},
         credentials: null ,
-        errors: []
+        errors: null
     }
 
     
@@ -69,7 +75,7 @@ export class Provider extends Component{
                         password: password
                     }
             });
-            Cookies.set('authenticatedUser', user, {expires: 1});
+            cookies.set('authenticatedUser', JSON.stringify(user) , {expires: 1});
             
         } else {
             this.handleError(user);
@@ -81,10 +87,11 @@ export class Provider extends Component{
         e.preventDefault();
         let input = this.state.formData;
         const newUser = await this.data.api('/users', 'POST', input, false, null);
-        if(newUser){
-            await this.signIn(e);
+        if(newUser.status === 201){
+            await this.signIn();
+            appHistory.push('/')
         } else {
-            this.handleError(newUser);
+            this.handleError(newUser)
         }
     }
 
@@ -96,9 +103,16 @@ export class Provider extends Component{
         Cookies.remove('authenticatedUser');
     }
 
+
+     /**
+     * Places POST request to api to create a new course with the formData state recorded upon completion of the form. Hands off to handleError method to address error messaging.
+     * 
+     * @param {event} e | The form submission event.
+     */
+
     createCourse = async (e) => {
         e.preventDefault();
-                
+        this.setState({errors: null});
         const newCourse = await this.data.api('/courses', 'POST', {...this.state.formData, userId: this.state.authenticatedUser.id}, true, this.state.credentials);
         if(newCourse.status === 201){
             appHistory.push('/');
@@ -108,6 +122,14 @@ export class Provider extends Component{
        this.resetFormState();
         
     }
+
+
+    /**
+     * Places POST request to api to update a specified course with the formData state recorded upon completion of the form. Hands off to handleError method to address error messaging.
+     * 
+     * @param {event} e | The form submission event.
+     * @param {number} id | The course id defining the specific course needing update.
+     */
 
     updateCourse = async (e, id) => {
         e.preventDefault();
@@ -124,6 +146,13 @@ export class Provider extends Component{
         this.resetFormState();
     }
 
+
+    /**
+     * Handles input received from user by pushing value of input into the formData state object.
+     * 
+     * @param {event} e | The keyboard input event triggering the function call.
+     */
+
     handleInput = (e) => {
         let name = e.target.name;
         let value = e.target.value;
@@ -133,13 +162,33 @@ export class Provider extends Component{
         });
     }
 
+
+    /**
+     * Handles error messaging for form submissions throughout the application by updating the errors state of the Context application to an array of list items containing error messages.
+     * 
+     * @param {Object} response | Response object received from api call 
+     * 
+     */
+
     handleError = async (response) => {
-        response.json().then(data => this.errors.push(data)).then(console.log(this.errors));
+        let errorArray = [];
+        response.json().then(data => { 
+            for(let each of data){
+                errorArray.push(each.message)
+            }
+            let listItems = errorArray.map(message => <li key={message.index}>{message}</li>);
+            
+            this.setState({
+                errors: listItems
+            })
+        }
+        )
     }
 
     resetFormState = () => {
         this.setState({
-            formData: {}
+            formData: {},
+            errors: null
         });
     }
     
@@ -152,6 +201,7 @@ export const Consumer = AppContext.Consumer;
  * @param {Component} - Accepts React Component
  * @returns {function} - Returns a higher-order component
  */
+
 export default function withContext(Component){
     return function AppContextComponent(props){
         return (

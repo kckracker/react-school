@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {Buttons} from './Buttons';
 import withContext from '../Context';
 
@@ -6,6 +7,13 @@ const ButtonsWithContext = withContext(Buttons);
 export function CreateCourse(props){
 
     const context = props.context;
+    const [didLoad, setDidLoad] = useState(false);
+
+    if(didLoad === false){
+        context.actions.resetForm();
+        setDidLoad(true);
+    }
+
 
     return (
         <main>

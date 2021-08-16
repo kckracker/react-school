@@ -13,6 +13,7 @@ export function UpdateCourse(props){
     const loadCourse = async () => {
         await context.data.fetchCourse(id)
             .then(data => {
+                context.actions.resetForm();
                 setCourse(data);
                 setUser(data.User);
                 setDidLoad(true);
@@ -27,7 +28,15 @@ export function UpdateCourse(props){
         <main>
             <div className="wrap">
                 <h2>Update Course</h2>
-                <form onSubmit={(e) => context.data.updateCourse(e)}>
+                { context.errors &&
+                    <div className="validation--errors">
+                        <h3>Validation Errors</h3>
+                        <ul>
+                            {context.errors}
+                        </ul>
+                    </div> 
+                }
+                <form onSubmit={context.actions.updateCourse}>
                     <div className="main--flex">
                         <div>
                             <label htmlFor="courseTitle"></label>

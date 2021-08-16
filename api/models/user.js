@@ -36,10 +36,10 @@ module.exports = (sequelize) => {
             allowNull: false,
             validate: {
                 notNull: {
-                    msg: "Please enter a value for 'lastName'"
+                    msg: "Please enter a value for 'Last Name'"
                 },
                 notEmpty: {
-                    msg: "Please enter a value for 'lastName'"
+                    msg: "Please enter a value for 'Last Name'"
                 }
             }
         },
@@ -48,8 +48,11 @@ module.exports = (sequelize) => {
             unique: true,
             allowNull: false,
             validate: {
+                notNull: {
+                    msg: "Please enter a value for 'Email Address'"
+                },
                 isEmail: {
-                    msg: "Please enter a valid 'email'"
+                    msg: "Please enter a valid email"
                 }
             }
         },
@@ -58,10 +61,10 @@ module.exports = (sequelize) => {
             allowNull: false,
             validate: {
                 notNull: {
-                    msg: "Please enter a value for 'password'"
+                    msg: "Please enter a value for 'Password'"
                 },
                 notEmpty: {
-                    msg: "Please enter a value for 'password'"
+                    msg: "Please enter a value for 'Password'"
                 }
             },
             set(val){
