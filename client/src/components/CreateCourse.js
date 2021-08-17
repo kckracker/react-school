@@ -10,10 +10,11 @@ export function CreateCourse(props){
     const [didLoad, setDidLoad] = useState(false);
 
     if(didLoad === false){
+        console.log(context.authenticatedUser);
         context.actions.resetForm();
         setDidLoad(true);
     }
-
+    
 
     return (
         <main>

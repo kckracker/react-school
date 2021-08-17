@@ -7,12 +7,6 @@ const AppContext = React.createContext();
 
 export const appHistory = createBrowserHistory();
 
-const cookies = Cookies.withConverter({
-    read: function(string){
-        return JSON.parse(string)
-    }
-})
-
 export class Provider extends Component{
     constructor(){
         super();
@@ -20,7 +14,10 @@ export class Provider extends Component{
     }
 
     state = {
-        authenticatedUser: cookies.get('authenticatedUser', {expires: 1}) || null,
+        authenticatedUser: () => {
+            const cookie = Cookies.get('authenticatedUser');
+            return (cookie ? JSON.parse(cookie) : null);
+        },
         formData: {},
         credentials: null ,
         errors: null
@@ -65,17 +62,17 @@ export class Provider extends Component{
         let password = this.state.formData.password;
         const user = await this.data.fetchUser(emailAddress, password);
         if(user){
+            Cookies.set('authenticatedUser', JSON.stringify(user) , {expires: 1});
             this.setState({
                     authenticatedUser: {
-                        ...user,
-                        password: password
+                        ...user
                     },
                     credentials: {
                         username: emailAddress,
                         password: password
                     }
             });
-            cookies.set('authenticatedUser', JSON.stringify(user) , {expires: 1});
+            
             
         } else {
             this.handleError(user);
