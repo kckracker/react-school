@@ -29,7 +29,11 @@ export function CourseDetail(props){
 
     const deleteCourse = async (e) => {
         e.preventDefault();
-        await context.data.api(`/courses/${id}`,"DELETE", null, true, context.credentials);
+        let credentials = {
+            username: context.authenticatedUser.emailAddress,
+            password: context.authenticatedUser.password
+        }
+        await context.data.api(`/courses/${id}`,"DELETE", null, true, credentials);
         history.push('/');
     }
     

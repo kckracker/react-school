@@ -14,12 +14,8 @@ export class Provider extends Component{
     }
 
     state = {
-        authenticatedUser: () => {
-            const cookie = Cookies.get('authenticatedUser');
-            return (cookie ? JSON.parse(cookie) : null);
-        },
+        authenticatedUser: Cookies.get('authenticatedUser') ? JSON.parse(Cookies.get('authenticatedUser')) : null ,
         formData: {},
-        credentials: null ,
         errors: null
     }
 
@@ -28,12 +24,12 @@ export class Provider extends Component{
     render(){
         
         const { authenticatedUser } = this.state;
-        const { credentials } = this.state;
         const { errors } = this.state;
+        const {formData} = this.state;
 
         const value = {
             authenticatedUser,
-            credentials,
+            formData,
             errors,
             data: this.data,
             actions: {
@@ -62,17 +58,13 @@ export class Provider extends Component{
         let password = this.state.formData.password;
         const user = await this.data.fetchUser(emailAddress, password);
         if(user){
-            Cookies.set('authenticatedUser', JSON.stringify(user) , {expires: 1});
             this.setState({
                     authenticatedUser: {
-                        ...user
-                    },
-                    credentials: {
-                        username: emailAddress,
+                        ...user,
                         password: password
                     }
             });
-            
+            Cookies.set('authenticatedUser', JSON.stringify(user) , {expires: 1});
             
         } else {
             this.handleError(user);
@@ -92,12 +84,11 @@ export class Provider extends Component{
         }
     }
 
-    signOut = async() => {
-        this.setState({
-            authenticatedUser: null,
-            credentials: null
-        });
+    signOut = () => {
         Cookies.remove('authenticatedUser');
+        this.setState({
+            authenticatedUser: null
+        })
     }
 
 
@@ -110,9 +101,13 @@ export class Provider extends Component{
     createCourse = async (e) => {
         e.preventDefault();
         this.setState({errors: null});
-        const newCourse = await this.data.api('/courses', 'POST', {...this.state.formData, userId: this.state.authenticatedUser.id}, true, this.state.credentials);
+        const credentials = {
+            username: this.state.authenticatedUser.emailAddress,
+            password: this.state.authenticatedUser.password
+        }
+        const newCourse = await this.data.api('/courses', 'POST', {...this.state.formData, userId: this.state.authenticatedUser.id}, true, credentials);
         if(newCourse.status === 201){
-            appHistory.push('/');
+            appHistory.goBack();
         } else {
             this.handleError(newCourse);
         }
@@ -130,8 +125,8 @@ export class Provider extends Component{
 
     updateCourse = async (e, id) => {
         e.preventDefault();
-        let credentials = {
-            username: this.state.authenticatedUser.username,
+        const credentials = {
+            username: this.state.authenticatedUser.emailAddress,
             password: this.state.authenticatedUser.password
         }
         const updatedCourse = await this.data.api(`/courses/${id}`, 'PUT', this.formData, true, credentials);
@@ -182,7 +177,7 @@ export class Provider extends Component{
         )
     }
 
-    resetFormState = () => {
+    resetFormState = async () => {
         this.setState({
             formData: {},
             errors: null

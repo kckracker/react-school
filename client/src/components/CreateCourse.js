@@ -1,21 +1,15 @@
-import { useState } from 'react';
-import {Buttons} from './Buttons';
+import { Buttons } from './Buttons';
 import withContext from '../Context';
 
+
 const ButtonsWithContext = withContext(Buttons);
+
 // Renders form to add new course to a user's list - POST request api/courses - along with Cancel button for return to Course List view
 export function CreateCourse(props){
-
-    const context = props.context;
-    const [didLoad, setDidLoad] = useState(false);
-
-    if(didLoad === false){
-        console.log(context.authenticatedUser);
-        context.actions.resetForm();
-        setDidLoad(true);
-    }
     
-
+    const context = props.context;
+    
+    
     return (
         <main>
             <div className="wrap">
