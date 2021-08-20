@@ -41,6 +41,7 @@ export class Provider extends Component{
                 createUser: this.createUser,
                 updateCourse: this.updateCourse, 
                 resetForm: this.resetFormState,
+                resetErrors: this.resetErrors,
                 deleteCourse: this.deleteCourse
             },
             
@@ -64,7 +65,7 @@ export class Provider extends Component{
                         password: password
                     }
             });
-            Cookies.set('authenticatedUser', JSON.stringify(user) , {expires: 1});
+            Cookies.set('authenticatedUser', JSON.stringify(this.state.authenticatedUser) , {expires: 1});
             
         } else {
             this.handleError(user);
@@ -84,7 +85,7 @@ export class Provider extends Component{
         }
     }
 
-    signOut = () => {
+    signOut = async () => {
         Cookies.remove('authenticatedUser');
         this.setState({
             authenticatedUser: null
@@ -166,9 +167,9 @@ export class Provider extends Component{
         let errorArray = [];
         response.json().then(data => { 
             for(let each of data){
-                errorArray.push(each.message)
+                errorArray.push(each)
             }
-            let listItems = errorArray.map(message => <li key={message.index}>{message}</li>);
+            let listItems = errorArray.map(message => <li key={message.path}>{message.message}</li>);
             
             this.setState({
                 errors: listItems
@@ -179,7 +180,12 @@ export class Provider extends Component{
 
     resetFormState = async () => {
         this.setState({
-            formData: {},
+            formData: {}
+        });
+    }
+
+    resetErrors = async () => {
+        this.setState({
             errors: null
         });
     }

@@ -1,5 +1,6 @@
 import { Buttons } from './Buttons';
 import withContext from '../Context';
+import { useEffect } from 'react';
 
 
 const ButtonsWithContext = withContext(Buttons);
@@ -9,6 +10,8 @@ export function CreateCourse(props){
     
     const context = props.context;
     
+    useEffect(() => context.actions.resetForm, []);
+    useEffect(() => context.actions.resetErrors, []);
     
     return (
         <main>
