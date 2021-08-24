@@ -1,9 +1,15 @@
 import { Buttons } from './Buttons';
 import { useState, useEffect } from 'react';
+import withContext from '../Context';
+
+const ButtonsWithContext = withContext(Buttons);
 
 // Renders update form for existing course - PUT request api/courses/:id - along with Cancel button to return to Course Detail view
 export function UpdateCourse(props){
     const context = props.context;
+
+    useEffect(() => context.actions.resetForm, [context.actions.resetForm]);
+    useEffect(() => context.actions.resetErrors, [context.actions.resetErrors]);
 
     const [course, setCourse] = useState([]);
     const [user, setUser] = useState({});
@@ -29,9 +35,6 @@ export function UpdateCourse(props){
         e.preventDefault();
         await context.actions.updateCourse(id);
     }
-
-    useEffect(() => {return context.actions.resetForm}, []);
-    useEffect(() => {return context.actions.resetErrors}, []);
 
     return(
         <main>
@@ -64,7 +67,7 @@ export function UpdateCourse(props){
                             <textarea id="materialsNeeded" name="materialsNeeded" defaultValue={course.materialsNeeded} onChange={context.actions.handleInput}></textarea>
                         </div>
                     </div>
-                    <Buttons buttonName="Update Course"></Buttons>
+                    <ButtonsWithContext buttonName="Update Course"></ButtonsWithContext>
                 </form>
             </div>
         </main>
