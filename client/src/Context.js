@@ -5,11 +5,13 @@ import { createBrowserHistory } from "history";
 
 const AppContext = React.createContext();
 
-export const appHistory = createBrowserHistory();
+
+// Creates new BrowserHistory instance and requires refresh upon entry pushing to stack. Syntax help found from user BARNOWL at https://stackoverflow.com/questions/56747487/react-router-doesnt-re-render-after-history-push/56755280
+export const appHistory = createBrowserHistory({forceRefresh: true});
 
 export class Provider extends Component{
-    constructor(){
-        super();
+    constructor(props){
+        super(props);
         this.data = new Data();
     }
 
@@ -42,7 +44,8 @@ export class Provider extends Component{
                 updateCourse: this.updateCourse, 
                 resetForm: this.resetFormState,
                 resetErrors: this.resetErrors,
-                deleteCourse: this.deleteCourse
+                deleteCourse: this.deleteCourse,
+                setFormData: this.setFormData
             },
             
         };
@@ -54,7 +57,7 @@ export class Provider extends Component{
         )
     }
 
-    signIn = async () => { 
+    signIn = async (location = null) => { 
         let emailAddress = this.state.formData.emailAddress;
         let password = this.state.formData.password;
         const user = await this.data.fetchUser(emailAddress, password);
@@ -66,7 +69,7 @@ export class Provider extends Component{
                     }
             });
             Cookies.set('authenticatedUser', JSON.stringify(this.state.authenticatedUser) , {expires: 1});
-            
+            appHistory.goBack();
         } else {
             this.handleError(user);
         }
@@ -79,7 +82,6 @@ export class Provider extends Component{
         const newUser = await this.data.api('/users', 'POST', input, false, null);
         if(newUser.status === 201){
             await this.signIn();
-            appHistory.push('/')
         } else {
             this.handleError(newUser)
         }
@@ -108,7 +110,7 @@ export class Provider extends Component{
         }
         const newCourse = await this.data.api('/courses', 'POST', {...this.state.formData, userId: this.state.authenticatedUser.id}, true, credentials);
         if(newCourse.status === 201){
-            appHistory.goBack();
+            appHistory.push('/');
         } else {
             this.handleError(newCourse);
         }
@@ -118,21 +120,20 @@ export class Provider extends Component{
 
 
     /**
-     * Places POST request to api to update a specified course with the formData state recorded upon completion of the form. Hands off to handleError method to address error messaging.
+     * Places PUT request to api to update a specified course with the formData state recorded upon completion of the form. Hands off to handleError method to address error messaging.
      * 
-     * @param {event} e | The form submission event.
      * @param {number} id | The course id defining the specific course needing update.
      */
 
-    updateCourse = async (e, id) => {
-        e.preventDefault();
+    updateCourse = async (id) => {
+        
         const credentials = {
             username: this.state.authenticatedUser.emailAddress,
             password: this.state.authenticatedUser.password
         }
-        const updatedCourse = await this.data.api(`/courses/${id}`, 'PUT', this.formData, true, credentials);
-        if(updatedCourse.status === 201){
-            appHistory.push('/');
+        const updatedCourse = await this.data.api(`/courses/${id}`, 'PUT', {...this.state.formData, userId: this.state.authenticatedUser.id}, true, credentials);
+        if(updatedCourse.status === 201 || updatedCourse.status === 304 || updatedCourse.status === 204){
+            appHistory.push('/'); 
         } else {
             this.handleError(updatedCourse)
         }
@@ -155,6 +156,12 @@ export class Provider extends Component{
         });
     }
 
+
+    setFormData  = (data) => {
+        this.setState({
+            formData: {...data}
+        })
+    }
 
     /**
      * Handles error messaging for form submissions throughout the application by updating the errors state of the Context application to an array of list items containing error messages.
@@ -189,7 +196,7 @@ export class Provider extends Component{
             errors: null
         });
     }
-    
+
 }
 
 export const Consumer = AppContext.Consumer;

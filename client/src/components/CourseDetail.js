@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import {Link, useParams, useHistory} from 'react-router-dom';
-
+import ReactMarkdown from 'react-markdown';
 
 // Retrieves a user's course details - GET request for api/courses/:id - also a Delete button to send DELETE request for api/courses/:id and Update button to direct to the UpdateCourse component
 
@@ -67,7 +67,7 @@ export function CourseDetail(props){
                             <h4 className="course--name">{course.title}</h4>
                             <p>By {user}</p>
 
-                            <p>{course.description}</p>
+                            <ReactMarkdown children={course.description}></ReactMarkdown>
                             
                         </div>
                         <div>
@@ -75,9 +75,7 @@ export function CourseDetail(props){
                             <p>{course.estimatedTime}</p>
 
                             <h3 className="course--detail--title">Materials Needed</h3>
-                            <ul className="course--detail--list">
-                                {course.materialsNeeded}
-                            </ul>
+                            <ReactMarkdown children={course.materialsNeeded} className="course--detail--list"></ReactMarkdown>
                         </div>
                     </div>
                 </form>

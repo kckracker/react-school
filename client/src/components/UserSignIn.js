@@ -14,7 +14,7 @@ export function UserSignIn(props){
     const context = props.context;
     const handleSubmit = async (e) => {
         e.preventDefault();
-        await context.actions.signIn()
+        await context.actions.signIn(props.location)
             .then(appHistory.goBack())
             .catch(error => {
                 if(error.status === 404){

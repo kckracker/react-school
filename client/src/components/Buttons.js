@@ -9,6 +9,7 @@ export function Buttons(props){
     const handleClick = (e) => {
         e.preventDefault();
         context.actions.resetForm();
+        context.actions.resetErrors();
         history.push('/');
     }
 

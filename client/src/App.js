@@ -1,5 +1,5 @@
-import { BrowserRouter as Router} from 'react-router-dom';
 import { Route, Switch } from 'react-router-dom';
+import { Provider } from './Context';
 
 import { Header } from './components/Header';
 import {UserSignUp } from './components/UserSignUp';
@@ -27,22 +27,20 @@ const PrivateRouteWithContext = withContext(PrivateRoute);
 function App() {
 
   return (
-    <Router>
+    <Provider>
       <div>
           <HeaderWithContext />
           <Switch>
               <Route path="/signup" component={UserSignUpwithContext} />             
               <Route path="/signin" component={UserSignInwithContext} />
               <Route path="/signout" component={UserSignOutwithContext} />
-              <PrivateRouteWithContext path="/courses/:id/update">
-                <UpdateCoursewithContext />
-              </PrivateRouteWithContext>
+              <PrivateRouteWithContext path="/courses/:id/update" component={UpdateCoursewithContext}/>
               <Route path="/courses/:id" component={CourseDetailwithContext} />
               <PrivateRouteWithContext path="/createcourse" component={CreateCoursewithContext} />
               <Route path="/" component={CourseswithContext} />                
           </Switch>
       </div>
-    </Router>
+    </Provider>
   );
 }
 

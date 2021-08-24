@@ -1,21 +1,22 @@
 import { Buttons } from './Buttons';
-import { useParams } from 'react-router';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 // Renders update form for existing course - PUT request api/courses/:id - along with Cancel button to return to Course Detail view
 export function UpdateCourse(props){
-    let {id} = useParams();
     const context = props.context;
+
     const [course, setCourse] = useState([]);
     const [user, setUser] = useState({});
     const [didLoad, setDidLoad] = useState(false);
+    const { id } = props.computedMatch.params;
 
+    
     const loadCourse = async () => {
         await context.data.fetchCourse(id)
-            .then(data => {
-                context.actions.resetForm();
-                setCourse(data);
-                setUser(data.User);
+            .then(each => {
+                setCourse(each);
+                context.actions.setFormData(each);
+                setUser(each.User);
                 setDidLoad(true);
             })
     }
@@ -23,6 +24,14 @@ export function UpdateCourse(props){
     if(didLoad !== true){
         loadCourse();
     }
+
+    async function handleSubmit(e){
+        e.preventDefault();
+        await context.actions.updateCourse(id);
+    }
+
+    useEffect(() => {return context.actions.resetForm}, []);
+    useEffect(() => {return context.actions.resetErrors}, []);
 
     return(
         <main>
@@ -36,23 +45,23 @@ export function UpdateCourse(props){
                         </ul>
                     </div> 
                 }
-                <form onSubmit={context.actions.updateCourse}>
+                <form onSubmit={handleSubmit}>
                     <div className="main--flex">
                         <div>
-                            <label htmlFor="courseTitle"></label>
-                            <input id="courseTitle" name="courseTitle" type="text" value={course.title}/>
+                            <label htmlFor="title"></label>
+                            <input id="title" name="title" type="text" defaultValue={course.title} onChange={context.actions.handleInput}/>
 
                             <p>By {user.firstName} {user.lastName}</p>
 
-                            <label htmlFor="courseDescription">Course Description</label>
-                            <textarea id="courseDescription" name="courseDescription" value={course.description}></textarea>
+                            <label htmlFor="description">Course Description</label>
+                            <textarea id="description" name="description" defaultValue={course.description} onChange={context.actions.handleInput}></textarea>
                         </div>
                         <div>
                             <label htmlFor="estimatedTime">Estimated Time</label>
-                            <input id="estimatedTime" name="estimatedTime" type="text" value={course.estimatedTime} />
+                            <input id="estimatedTime" name="estimatedTime" type="text" defaultValue={course.estimatedTime} onChange={context.actions.handleInput} />
 
                             <label htmlFor="materialsNeeded">Materials Needed</label>
-                            <textarea id="materialsNeeded" name="materialsNeeded" value={course.materialsNeeded}></textarea>
+                            <textarea id="materialsNeeded" name="materialsNeeded" defaultValue={course.materialsNeeded} onChange={context.actions.handleInput}></textarea>
                         </div>
                     </div>
                     <Buttons buttonName="Update Course"></Buttons>
