@@ -1,6 +1,7 @@
 import React, {Component} from "react";
 import { Data } from "./Data";
 import Cookies from 'js-cookie';
+import {Redirect} from 'react-router-dom';
 import { createBrowserHistory } from "history";
 
 const AppContext = React.createContext();
@@ -171,7 +172,9 @@ export class Provider extends Component{
      */
 
     handleError = async (response) => {
+        console.log(response);
         let errorArray = [];
+        
         response.json().then(data => { 
             for(let each of data){
                 errorArray.push(each)
@@ -183,7 +186,11 @@ export class Provider extends Component{
             })
         }
         )
-    }
+        
+            
+        }
+        
+    
 
     resetFormState = async () => {
         this.setState({
