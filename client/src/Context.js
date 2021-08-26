@@ -1,7 +1,6 @@
 import React, {Component} from "react";
 import { Data } from "./Data";
 import Cookies from 'js-cookie';
-import {Redirect} from 'react-router-dom';
 import { createBrowserHistory } from "history";
 
 const AppContext = React.createContext();
@@ -46,7 +45,8 @@ export class Provider extends Component{
                 resetForm: this.resetFormState,
                 resetErrors: this.resetErrors,
                 deleteCourse: this.deleteCourse,
-                setFormData: this.setFormData
+                setFormData: this.setFormData,
+                handleError: this.handleError
             },
             
         };
@@ -58,33 +58,36 @@ export class Provider extends Component{
         )
     }
 
-    signIn = async (location = null) => { 
-        let emailAddress = this.state.formData.emailAddress;
-        let password = this.state.formData.password;
+    signIn = async () => { 
+        const emailAddress = this.state.formData.emailAddress;
+        const password = this.state.formData.password;
         const user = await this.data.fetchUser(emailAddress, password);
-        if(user){
+        if(user.id){
             this.setState({
-                    authenticatedUser: {
-                        ...user,
-                        password: password
-                    }
-            });
-            Cookies.set('authenticatedUser', JSON.stringify(this.state.authenticatedUser) , {expires: 1});
-            appHistory.goBack();
+                authenticatedUser: {
+                    ...user,
+                    password: password
+                }
+                });
+                Cookies.set('authenticatedUser', JSON.stringify(this.state.authenticatedUser) , {expires: 1});
+                appHistory.goBack();
+                this.resetFormState();
         } else {
             this.handleError(user);
-        }
-        this.resetFormState();
+            this.resetFormState();
+        } 
+  
+        
     }
 
     signUp = async (e) => {
         e.preventDefault();
-        let input = this.state.formData;
+        const input = this.state.formData;
         const newUser = await this.data.api('/users', 'POST', input, false, null);
         if(newUser.status === 201){
             await this.signIn();
         } else {
-            this.handleError(newUser)
+            newUser.json().then(data => this.handleError(data))   
         }
     }
 
@@ -136,7 +139,7 @@ export class Provider extends Component{
         if(updatedCourse.status === 201 || updatedCourse.status === 304 || updatedCourse.status === 204){
             appHistory.push('/'); 
         } else {
-            this.handleError(updatedCourse)
+            updatedCourse.json().then(data => this.handleError(data))  
         }
         this.resetFormState();
     }
@@ -172,11 +175,14 @@ export class Provider extends Component{
      */
 
     handleError = async (response) => {
-        console.log(response);
         let errorArray = [];
-        
-        response.json().then(data => { 
-            for(let each of data){
+        if(Object.keys(response).length < 2){
+            response.msg 
+            ? this.setState({errors: <li key={response.path}>{response.msg}</li>})
+            : this.setState({errors: <li key={response.path}>{response.message}</li>})
+                
+        } else{
+            for(let each of response){
                 errorArray.push(each)
             }
             let listItems = errorArray.map(message => <li key={message.path}>{message.message}</li>);
@@ -185,10 +191,10 @@ export class Provider extends Component{
                 errors: listItems
             })
         }
-        )
         
-            
-        }
+        
+    }
+
         
     
 

@@ -11,7 +11,7 @@ export function CreateCourse(props){
     const context = props.context;
     
     useEffect(() => context.actions.resetForm, [context.actions.resetForm]);
-    useEffect(() => context.actions.resetErrors, [context.actions.resetErrors]);
+    // useEffect(() => context.actions.resetErrors, [context.actions.resetErrors]);
     
     return (
         <main>

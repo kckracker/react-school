@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 // Renders a list of courses - GET request to api/courses - and links them to their corresponding CourseDetail component route. Also renders Create Course button.
 export function Courses(props){
     const [courses, setCourses] = useState([]);
-    const [hasLoaded, setHasLoaded] = useState(false);
-    const displayCourses = async () => {
-        await props.context.data.fetchCourses()
+ 
+    useEffect(() => {
+        async function getCourses() {
+            await props.context.data.fetchCourses()
             .then(each => {
                 setCourses(each.map(course => {
                     return <Link key={course.id} className="course--module course--link" to={`/courses/${course.id}`}>
@@ -14,15 +15,12 @@ export function Courses(props){
                         <h3 className="course--title">{course.title}</h3>
                         </Link>
                 }));
-            })
-            .then(() => setHasLoaded(true))
-      }
-    
-    if(hasLoaded !== true){
-        displayCourses()
-    }
-    
-    
+            })    
+        }
+        getCourses();
+    }, [props.context.data, setCourses]
+    );
+
     return(
         <main>
             <div className="wrap main--grid">
