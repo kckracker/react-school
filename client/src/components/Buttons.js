@@ -10,7 +10,7 @@ export function Buttons(props){
         e.preventDefault();
         context.actions.resetForm();
         context.actions.resetErrors();
-        history.push('/');
+        history.goBack();
     }
 
 

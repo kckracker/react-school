@@ -37,7 +37,7 @@ export class Data {
         const user = await this.api('/users', 'GET', null, true, {username, password})
         if(user.status === 200){
             return user.json().then(data => data)
-        } else if(user.status === 401){
+        } else if(user.status === 401 || user.status === 400){
             return user.json().then(data => data)
         } else{
             throw new Error();

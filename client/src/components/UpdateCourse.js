@@ -14,6 +14,7 @@ export function UpdateCourse(props){
     const [course, setCourse] = useState([]);
     const [user, setUser] = useState({});
     const [didLoad, setDidLoad] = useState(false);
+    const [formData, setFormData] = useState({});
     const { id } = props.computedMatch.params;
 
     
@@ -31,9 +32,24 @@ export function UpdateCourse(props){
         loadCourse();
     }
 
+    /**
+     * Handles input received from user by pushing value of input into the formData state object.
+     * 
+     * @param {event} e | The keyboard input event triggering the function call.
+     */
+
+     const handleInput = (e) => {
+        let name = e.target.name;
+        let value = e.target.value;
+        context.actions.setFormData({
+            ...context.formData,
+            [name]: value
+        });
+    }
+
     async function handleSubmit(e){
         e.preventDefault();
-        await context.actions.updateCourse(id);
+        await context.actions.updateCourse(id, formData);
     }
 
     return(
@@ -52,19 +68,19 @@ export function UpdateCourse(props){
                     <div className="main--flex">
                         <div>
                             <label htmlFor="title"></label>
-                            <input id="title" name="title" type="text" defaultValue={course.title} onChange={context.actions.handleInput}/>
+                            <input id="title" name="title" type="text" defaultValue={course.title} onChange={handleInput}/>
 
                             <p>By {user.firstName} {user.lastName}</p>
 
                             <label htmlFor="description">Course Description</label>
-                            <textarea id="description" name="description" defaultValue={course.description} onChange={context.actions.handleInput}></textarea>
+                            <textarea id="description" name="description" defaultValue={course.description} onChange={handleInput}></textarea>
                         </div>
                         <div>
                             <label htmlFor="estimatedTime">Estimated Time</label>
-                            <input id="estimatedTime" name="estimatedTime" type="text" defaultValue={course.estimatedTime} onChange={context.actions.handleInput} />
+                            <input id="estimatedTime" name="estimatedTime" type="text" defaultValue={course.estimatedTime} onChange={handleInput} />
 
                             <label htmlFor="materialsNeeded">Materials Needed</label>
-                            <textarea id="materialsNeeded" name="materialsNeeded" defaultValue={course.materialsNeeded} onChange={context.actions.handleInput}></textarea>
+                            <textarea id="materialsNeeded" name="materialsNeeded" defaultValue={course.materialsNeeded} onChange={handleInput}></textarea>
                         </div>
                     </div>
                     <ButtonsWithContext buttonName="Update Course"></ButtonsWithContext>

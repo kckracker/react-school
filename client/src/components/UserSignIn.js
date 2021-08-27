@@ -35,9 +35,9 @@ export function UserSignIn(props){
                 }
                 <form onSubmit={handleSubmit}>
                     <label htmlFor="emailAddress">Email Address</label>
-                    <input id="emailAddress" name="emailAddress" type="email" placeholder="email address" onChange={context.actions.handleInput} required/>
+                    <input id="emailAddress" name="emailAddress" type="email" placeholder="email address" onChange={context.actions.handleInput} />
                     <label htmlFor="password">Password</label>
-                    <input id="password" name="password" type="password" placeholder="password" onChange={context.actions.handleInput} required/>
+                    <input id="password" name="password" type="password" placeholder="password" onChange={context.actions.handleInput} />
                     <ButtonsWithContext buttonName="Sign In"/>
                 </form>
                 <p>Don't have a user account? Click here to <Link to="/signup">sign up</Link>!</p>

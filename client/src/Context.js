@@ -116,7 +116,7 @@ export class Provider extends Component{
         if(newCourse.status === 201){
             appHistory.push('/');
         } else {
-            this.handleError(newCourse);
+            newCourse.json().then( data => this.handleError(data));
         }
        this.resetFormState();
         
@@ -138,10 +138,13 @@ export class Provider extends Component{
         const updatedCourse = await this.data.api(`/courses/${id}`, 'PUT', {...this.state.formData, userId: this.state.authenticatedUser.id}, true, credentials);
         if(updatedCourse.status === 201 || updatedCourse.status === 304 || updatedCourse.status === 204){
             appHistory.push('/'); 
+            this.resetFormState();
         } else {
-            updatedCourse.json().then(data => this.handleError(data))  
+            updatedCourse.json()
+                .then(data => this.handleError(data));
+            this.resetFormState();  
         }
-        this.resetFormState();
+        
     }
 
 
@@ -150,7 +153,6 @@ export class Provider extends Component{
      * 
      * @param {event} e | The keyboard input event triggering the function call.
      */
-
     handleInput = (e) => {
         let name = e.target.name;
         let value = e.target.value;
@@ -176,11 +178,8 @@ export class Provider extends Component{
 
     handleError = async (response) => {
         let errorArray = [];
-        if(Object.keys(response).length < 2){
-            response.msg 
-            ? this.setState({errors: <li key={response.path}>{response.msg}</li>})
-            : this.setState({errors: <li key={response.path}>{response.message}</li>})
-                
+        if(response.msg){
+            this.setState({errors: <li>{response.msg}</li>})
         } else{
             for(let each of response){
                 errorArray.push(each)
@@ -191,8 +190,6 @@ export class Provider extends Component{
                 errors: listItems
             })
         }
-        
-        
     }
 
         

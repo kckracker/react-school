@@ -37,9 +37,9 @@ function App() {
               <Route path="/signup" component={UserSignUpwithContext} />             
               <Route path="/signin" component={UserSignInwithContext} />
               <Route path="/signout" component={UserSignOutwithContext} />
+              <PrivateRouteWithContext path="/courses/create" component={CreateCoursewithContext} />
               <PrivateRouteWithContext path="/courses/:id/update" component={UpdateCoursewithContext}/>
               <Route path="/courses/:id" component={CourseDetailwithContext} />
-              <PrivateRouteWithContext path="/createcourse" component={CreateCoursewithContext} />
               <Route path="/error" component={UnhandledError} />
               <Route exact path="/" component={CourseswithContext} />
               <Route component={NotFound} />                
