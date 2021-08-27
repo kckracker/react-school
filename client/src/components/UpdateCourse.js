@@ -49,7 +49,7 @@ export function UpdateCourse(props){
 
     async function handleSubmit(e){
         e.preventDefault();
-        await context.actions.updateCourse(id, formData);
+        await context.actions.updateCourse(id);
     }
 
     return(
