@@ -4,6 +4,7 @@ import { Redirect } from "react-router";
 export function UserSignOut(props){
     const context = props.context;
 
+    // Calls context method signOut on page direction
     useEffect(() => context.actions.signOut);
     return(
         <Redirect to="/" />

@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import withContext from '../Context';
 import { Buttons } from './Buttons';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 
 const ButtonsWithContext = withContext(Buttons);
@@ -12,14 +12,38 @@ const ButtonsWithContext = withContext(Buttons);
 
 export function UserSignIn(props){
     const context = props.context;
+
+    const [formData, setFormData] = useState();
+
+    /**
+     * Handles input received from user by pushing value of input into the formData state object.
+     * 
+     * @param {event} e | The keyboard input event triggering the function call.
+     */
+
+    const handleInput = (e) => {
+        let name = e.target.name;
+        let value = e.target.value;
+        setFormData({
+            ...formData,
+            [name]: value}
+        )
+    };
+
+    /**
+     * Handles submission of form by preventing default and awaiting context method signIn with state value formData
+     * 
+     * @param {event} e 
+     */
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        await context.actions.signIn()
-            .catch(error => context.handleError(error))
+        await context.actions.signIn(formData);
     }
 
-
-    useEffect(() => context.actions.resetForm, [context.actions.resetForm]);
+    // Cleans up formData on page change
+    useEffect(() => setFormData({}), [setFormData]);
+    // Cleans up context errors on page change
     useEffect(() => context.actions.resetErrors, [context.actions.resetErrors]);
     return(
         <main>
@@ -35,9 +59,9 @@ export function UserSignIn(props){
                 }
                 <form onSubmit={handleSubmit}>
                     <label htmlFor="emailAddress">Email Address</label>
-                    <input id="emailAddress" name="emailAddress" type="email" placeholder="email address" onChange={context.actions.handleInput} />
+                    <input id="emailAddress" name="emailAddress" type="email" placeholder="email address" onChange={handleInput} />
                     <label htmlFor="password">Password</label>
-                    <input id="password" name="password" type="password" placeholder="password" onChange={context.actions.handleInput} />
+                    <input id="password" name="password" type="password" placeholder="password" onChange={handleInput} />
                     <ButtonsWithContext buttonName="Sign In"/>
                 </form>
                 <p>Don't have a user account? Click here to <Link to="/signup">sign up</Link>!</p>

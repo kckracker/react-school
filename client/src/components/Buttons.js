@@ -2,14 +2,14 @@ import { useHistory } from "react-router-dom";
 
 // Function component to handle cancel form React calls
 export function Buttons(props){
-
-    const context = props.context;
     const history = useHistory();
 
+    /**
+     * Prevents default, resets form data, resets errors, and returns user to previous page.
+     * @param {event} e Button click event.
+     */
     const handleClick = (e) => {
         e.preventDefault();
-        context.actions.resetForm();
-        context.actions.resetErrors();
         history.goBack();
     }
 

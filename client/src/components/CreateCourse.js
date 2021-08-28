@@ -1,6 +1,6 @@
 import { Buttons } from './Buttons';
 import withContext from '../Context';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 
 const ButtonsWithContext = withContext(Buttons);
@@ -10,7 +10,38 @@ export function CreateCourse(props){
     
     const context = props.context;
     
-    useEffect(() => context.actions.resetForm, [context.actions.resetForm]);
+    const [formData, setFormData] = useState();
+
+    /**
+     * Handles input received from user by pushing value of input into the formData state object.
+     * 
+     * @param {event} e | The keyboard input event triggering the function call.
+     */
+
+    const handleInput = (e) => {
+        let name = e.target.name;
+        let value = e.target.value;
+        setFormData({
+            ...formData,
+            [name]: value}
+        )
+    };
+
+
+    /**
+     * Handles submission of form by preventing default and awaiting context method createCourse with state value formData
+     * 
+     * @param {event} e The form submission event
+     */
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        await context.actions.createCourse(formData);
+    }
+
+    // Cleans up formData on page change
+    useEffect(() => setFormData({}), [setFormData]);
+    // Cleans up context errors on page change
     useEffect(() => context.actions.resetErrors, [context.actions.resetErrors]);
     
     return (
@@ -26,29 +57,28 @@ export function CreateCourse(props){
                     </div> 
                 }
 
-                <form onSubmit={context.actions.createCourse}>
+                <form onSubmit={handleSubmit}>
                     <div className="main--flex">
                         <div>
                             <label htmlFor="title">Course Title</label>
-                            <input id="title" name="title" type="text" defaultValue="" onChange={context.actions.handleInput} />
-                        </div>
+                            <input id="title" name="title" type="text" defaultValue="" onChange={handleInput} />
                         
+                        
+                            <p>By {context.authenticatedUser.firstName} {context.authenticatedUser.lastName}</p>
                     
-                        <div>
+                        
                             <label htmlFor="description">Course Description</label>
-                            <textarea id="description" name="description" onChange={context.actions.handleInput}></textarea>
-                        </div>
-                        
-                    
+                            <textarea id="description" name="description" onChange={handleInput}></textarea>
+                       </div>
                         <div>
                             <label htmlFor="estimatedTime">Estimated Time</label>
-                            <input id="estimatedTime" name="estimatedTime" type="text" defaultValue="" onChange={context.actions.handleInput} />    
-                        </div>
+                            <input id="estimatedTime" name="estimatedTime" type="text" defaultValue="" onChange={handleInput} />    
+                        
                         
                     
-                        <div>
+                        
                             <label htmlFor="materialsNeeded">Materials Needed</label>
-                            <textarea id="materialsNeeded" name="materialsNeeded" onChange={context.actions.handleInput} ></textarea>
+                            <textarea id="materialsNeeded" name="materialsNeeded" onChange={handleInput} ></textarea>
                         </div>
                     </div>
                     <ButtonsWithContext buttonName="Create Course" />

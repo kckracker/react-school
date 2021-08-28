@@ -14,7 +14,7 @@ export function UpdateCourse(props){
     const [course, setCourse] = useState([]);
     const [user, setUser] = useState({});
     const [didLoad, setDidLoad] = useState(false);
-    const [formData, setFormData] = useState({});
+    const [formData, setFormData] = useState();
     const { id } = props.computedMatch.params;
 
     
@@ -22,7 +22,7 @@ export function UpdateCourse(props){
         await context.data.fetchCourse(id)
             .then(each => {
                 setCourse(each);
-                context.actions.setFormData(each);
+                setFormData(each);
                 setUser(each.User);
                 setDidLoad(true);
             })
@@ -41,16 +41,27 @@ export function UpdateCourse(props){
      const handleInput = (e) => {
         let name = e.target.name;
         let value = e.target.value;
-        context.actions.setFormData({
-            ...context.formData,
+        setFormData({
+            ...formData,
             [name]: value
         });
     }
 
+    /**
+     * Handles submission of form by preventing default and awaiting context method updateCourse with state value formData
+     * 
+     * @param {event} e The form submission event
+     */
+
     async function handleSubmit(e){
         e.preventDefault();
-        await context.actions.updateCourse(id);
+        await context.actions.updateCourse(id, formData);
     }
+
+    // Cleans up formData on page change
+    useEffect(() => setFormData({}), [setFormData]);
+    // Cleans up context errors on page change
+    useEffect(() => context.actions.resetErrors, [context.actions.resetErrors]);
 
     return(
         <main>
@@ -67,7 +78,7 @@ export function UpdateCourse(props){
                 <form onSubmit={handleSubmit}>
                     <div className="main--flex">
                         <div>
-                            <label htmlFor="title"></label>
+                            <label htmlFor="title">Course Title</label>
                             <input id="title" name="title" type="text" defaultValue={course.title} onChange={handleInput}/>
 
                             <p>By {user.firstName} {user.lastName}</p>

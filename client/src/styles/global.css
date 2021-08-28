@@ -234,13 +234,13 @@ input:focus, button:focus, .button:focus, textarea:focus {
     }
     .main--flex {
         display: flex;
-        flex-wrap: wrap;
-        flex-direction:column;
     }
+
     .main--flex div:first-child {
         flex-basis: 62%;
     }
     .main--flex div:last-child {
+        margin-left: 8%;
         flex-basis: 30%;
     }
     .course--detail--title {

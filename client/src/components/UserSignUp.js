@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect,useState } from "react";
 import { Buttons } from "./Buttons";
 import { Link} from "react-router-dom";
 import withContext from "../Context";
@@ -10,7 +10,38 @@ export function UserSignUp(props){
 
     const context = props.context;
 
-    useEffect(() => context.actions.resetForm, [context.actions.resetForm]);
+    const [formData, setFormData] = useState();
+
+    /**
+     * Handles input received from user by pushing value of input into the formData state object.
+     * 
+     * @param {event} e | The keyboard input event triggering the function call.
+     */
+
+    const handleInput = (e) => {
+        let name = e.target.name;
+        let value = e.target.value;
+        setFormData({
+            ...formData,
+            [name]: value}
+        )
+    };
+
+
+    /**
+     * Handles submission of form by preventing default and awaiting context method createCourse with state value formData
+     * 
+     * @param {event} e The form submission event
+     */
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        await context.actions.signUp(formData);
+    }
+
+    // Cleans up formData on page change
+    useEffect(() => setFormData({}), [setFormData]);
+    // Cleans up context errors on page change
     useEffect(() => context.actions.resetErrors, [context.actions.resetErrors]);
 
     return(
@@ -25,15 +56,15 @@ export function UserSignUp(props){
                         </ul>
                     </div> 
                 }
-                <form onSubmit={context.actions.signUp}>
+                <form onSubmit={handleSubmit}>
                     <label htmlFor="firstName">First Name</label>
-                    <input id="firstName" name="firstName" type="text" defaultValue="" onChange={context.actions.handleInput} />
+                    <input id="firstName" name="firstName" type="text" defaultValue="" onChange={handleInput} />
                     <label htmlFor="lastName">Last Name</label>
-                    <input id="lastName" name="lastName" type="text" defaultValue="" onChange={context.actions.handleInput} />
+                    <input id="lastName" name="lastName" type="text" defaultValue="" onChange={handleInput} />
                     <label htmlFor="emailAddress">Email Address</label>
-                    <input id="emailAddress" name="emailAddress" type="email" defaultValue="" onChange={context.actions.handleInput} />
+                    <input id="emailAddress" name="emailAddress" type="email" defaultValue="" onChange={handleInput} />
                     <label htmlFor="password">Password</label>
-                    <input id="password" name="password" type="password" defaultValue="" onChange={context.actions.handleInput} />
+                    <input id="password" name="password" type="password" defaultValue="" onChange={handleInput} />
                     <label htmlFor="confirmPassword">Confirm Password</label>
                     <input id="confirmPassword" name="confirmPassword" type="password" defaultValue="" />
                     <ButtonsWithContext buttonName="Sign Up"/>

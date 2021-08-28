@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 export function Courses(props){
     const [courses, setCourses] = useState([]);
 
-
+    // Effect call fetches course list on page change by calling context method fetchCourses.
     useEffect(() => {
         async function getCourses() {
             await props.context.data.fetchCourses()

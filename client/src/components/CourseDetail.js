@@ -13,7 +13,9 @@ export function CourseDetail(props){
     const [didLoad, setDidLoad] = useState(false);
     const {id} = useParams();
 
-
+    /**
+     * Function that fetches specific course data from fetchCourse with the id param. Assigns values to local state variables for use on page display.
+     */
     const loadCourse = async () => {
         await context.data.fetchCourse(id)
             .then(each => {
@@ -27,6 +29,11 @@ export function CourseDetail(props){
         loadCourse();
     }
 
+    /**
+     * Accepts delete button click event, prevents default, and pushes DELETE call to API with context supplied authenticatedUser credentials. Upon completion, returns user to the home page.
+     * 
+     * @param {event} e The delete button click event.
+     */
     const deleteCourse = async (e) => {
         e.preventDefault();
         let credentials = {

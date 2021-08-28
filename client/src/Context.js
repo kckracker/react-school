@@ -17,7 +17,6 @@ export class Provider extends Component{
 
     state = {
         authenticatedUser: Cookies.get('authenticatedUser') ? JSON.parse(Cookies.get('authenticatedUser')) : null ,
-        formData: {},
         errors: null
     }
 
@@ -27,11 +26,9 @@ export class Provider extends Component{
         
         const { authenticatedUser } = this.state;
         const { errors } = this.state;
-        const {formData} = this.state;
 
         const value = {
             authenticatedUser,
-            formData,
             errors,
             data: this.data,
             actions: {
@@ -42,10 +39,8 @@ export class Provider extends Component{
                 createCourse: this.createCourse,
                 createUser: this.createUser,
                 updateCourse: this.updateCourse, 
-                resetForm: this.resetFormState,
                 resetErrors: this.resetErrors,
                 deleteCourse: this.deleteCourse,
-                setFormData: this.setFormData,
                 handleError: this.handleError
             },
             
@@ -58,34 +53,37 @@ export class Provider extends Component{
         )
     }
 
-    signIn = async () => { 
-        const emailAddress = this.state.formData.emailAddress;
-        const password = this.state.formData.password;
-        const user = await this.data.fetchUser(emailAddress, password);
+    /**
+     * Calls fetchUser and stores user details if found or pushes error messaging to handleError method
+     * 
+     * @param {object} data User credential data supplied from local state variables upon form input and submission
+     */
+    signIn = async (data) => { 
+        const user = await this.data.fetchUser(data.emailAddress, data.password);
         if(user.id){
             this.setState({
                 authenticatedUser: {
                     ...user,
-                    password: password
+                    password: data.password
                 }
                 });
                 Cookies.set('authenticatedUser', JSON.stringify(this.state.authenticatedUser) , {expires: 1});
                 appHistory.goBack();
-                this.resetFormState();
         } else {
             this.handleError(user);
-            this.resetFormState();
         } 
   
         
     }
 
-    signUp = async (e) => {
-        e.preventDefault();
-        const input = this.state.formData;
-        const newUser = await this.data.api('/users', 'POST', input, false, null);
+    /**
+     * Awaits POST request to user with data supplied from object supplied from local state data. If successful, pushes to signIn method; if failed, pushes to handleError method.
+     * 
+     */
+    signUp = async (formData) => {
+        const newUser = await this.data.api('/users', 'POST', formData, false, null);
         if(newUser.status === 201){
-            await this.signIn();
+            await this.signIn(formData);
         } else {
             newUser.json().then(data => this.handleError(data))   
         }
@@ -105,20 +103,18 @@ export class Provider extends Component{
      * @param {event} e | The form submission event.
      */
 
-    createCourse = async (e) => {
-        e.preventDefault();
+    createCourse = async (formData) => {
         this.setState({errors: null});
         const credentials = {
             username: this.state.authenticatedUser.emailAddress,
             password: this.state.authenticatedUser.password
         }
-        const newCourse = await this.data.api('/courses', 'POST', {...this.state.formData, userId: this.state.authenticatedUser.id}, true, credentials);
+        const newCourse = await this.data.api('/courses', 'POST', {...formData, userId: this.state.authenticatedUser.id}, true, credentials);
         if(newCourse.status === 201){
             appHistory.push('/');
         } else {
             newCourse.json().then( data => this.handleError(data));
         }
-       this.resetFormState();
         
     }
 
@@ -129,45 +125,22 @@ export class Provider extends Component{
      * @param {number} id | The course id defining the specific course needing update.
      */
 
-    updateCourse = async (id) => {
+    updateCourse = async (id, formData) => {
         
         const credentials = {
             username: this.state.authenticatedUser.emailAddress,
             password: this.state.authenticatedUser.password
         }
-        const updatedCourse = await this.data.api(`/courses/${id}`, 'PUT', {...this.state.formData, userId: this.state.authenticatedUser.id}, true, credentials);
+        const updatedCourse = await this.data.api(`/courses/${id}`, 'PUT', {...formData, userId: this.state.authenticatedUser.id}, true, credentials);
         if(updatedCourse.status === 201 || updatedCourse.status === 304 || updatedCourse.status === 204){
             appHistory.push('/'); 
-            this.resetFormState();
         } else {
             updatedCourse.json()
                 .then(data => this.handleError(data));
-            this.resetFormState();  
         }
         
     }
 
-
-    /**
-     * Handles input received from user by pushing value of input into the formData state object.
-     * 
-     * @param {event} e | The keyboard input event triggering the function call.
-     */
-    handleInput = (e) => {
-        let name = e.target.name;
-        let value = e.target.value;
-        this.setState({
-            formData: {...this.state.formData,
-            [name]: value}
-        });
-    }
-
-
-    setFormData  = (data) => {
-        this.setState({
-            formData: {...data}
-        })
-    }
 
     /**
      * Handles error messaging for form submissions throughout the application by updating the errors state of the Context application to an array of list items containing error messages.
@@ -192,15 +165,9 @@ export class Provider extends Component{
         }
     }
 
-        
-    
-
-    resetFormState = async () => {
-        this.setState({
-            formData: {}
-        });
-    }
-
+    /**
+     * Sets the context state variable errors to null
+     */
     resetErrors = async () => {
         this.setState({
             errors: null
