@@ -22,7 +22,6 @@ export function UpdateCourse(props){
         await context.data.fetchCourse(id)
             .then(each => {
                 setCourse(each);
-                setFormData(each);
                 setUser(each.User);
                 setDidLoad(true);
             })
